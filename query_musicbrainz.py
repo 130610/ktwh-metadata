@@ -1,7 +1,6 @@
 import sys
 import codecs
 import musicbrainz2.webservice as ws
-import CDDB
 
 UTF8Writer = codecs.getwriter('utf8')
 sys.stdout = UTF8Writer(sys.stdout)
