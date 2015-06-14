@@ -10,6 +10,15 @@ BUILD:
 		$ make
 	in the root directory.
 
+DEPENDENCIES:
+	to run:
+		python 2.7
+		musicbrainz2
+		mutagen (be sure to use a version built for python 2)
+	for building only:
+		gcc
+		libcddb
+
 USAGE:
 	To generate the a database, use the wrapper script gendb.sh
 		$ ./gendb.sh <music dir> > db.txt
