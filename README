@@ -1,0 +1,18 @@
+DESCRIPTION:
+	This is a suite of scripts and programs that query various sources for
+	metadata about local music files. They produce a database containing
+	information from all the sources compiled into one line for each file.
+	It is intended to be used to collect information about tracks played for
+	royalty payments.
+
+BUILD:
+	To build the suite, simply run
+		$ make
+	in the root directory.
+
+USAGE:
+	To generate the a database, use the wrapper script gendb.sh
+		$ ./gendb.sh <music dir> > db.txt
+
+TO DO:
+	- Add ability to write tags back to files for easy indexing
