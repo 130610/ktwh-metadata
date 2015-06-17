@@ -5,8 +5,8 @@ IFS=$(echo -en "\n\b")
 function output_md {
 	IFS=' '
 	md=$(python2 query_metadata.py "$1")
-	mb_md=$(python2 query_musicbrainz.py -a \""$(echo "$md" | cut -f1)"\" -t \""$(echo "$md" | cut -f2)"\" -d \""$(echo "$md" | cut -f3)"\")
-	fdb_md=$(exec ./query_freedb $(echo "$md" | cut -f6) $(echo "$md" | cut -f5))
+	mb_md=$(python2 query_musicbrainz.py -n "$(echo "$md" | cut -f2)" -a \""$(echo "$md" | cut -f3)"\" -t \""$(echo "$md" | cut -f4)"\" -d \""$(echo "$md" | cut -f5)"\")
+	fdb_md=$(exec ./query_freedb $(echo "$md" | cut -f8) $(echo "$md" | cut -f7) $(echo "$md" | cut -f2))
 	echo "$md$mb_md$fdb_md"
 }
 
