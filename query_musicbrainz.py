@@ -8,11 +8,17 @@ sys.stdout = UTF8Writer(sys.stdout)
 UTF8Reader = codecs.getreader('utf8')
 sys.stdin = UTF8Reader(sys.stdin)
 
-fields = ['artist', 'album', 'date', 'label', 'genre', 'cddb']
+fields = ['title', 'tracknumber', 'artist', 'album', 'date', 'label', 'genre', 'cddb']
 
+tracknumber = ""
 artist = ""
 album = ""
 date = ""
+
+def setTrackNumber(num=1):
+	global tracknumber
+	tracknumber=num
+	return 1
 
 def setArtist(name=None):
 	global artist
@@ -30,6 +36,7 @@ def setDate(num=None):
 	return 1
 
 options = {
+	   "-n":setTrackNumber,
 	   "-a":setArtist,
 	   "-t":setAlbum,
 	   "-d":setDate
@@ -44,7 +51,7 @@ def bestTag(el):
 			best = entity
 	return best
 
-def search(artist=None, album=None, date=None):
+def search(tracknumber=None, artist=None, album=None, date=None):
 	query = ws.Query()
 #	searchTerms = ws.ReleaseFilter(title=album, artistName=artist, query=date)
 	searchTerms = ws.ReleaseFilter(query=artist + ", " + album + ", " + date)
@@ -69,13 +76,17 @@ def search(artist=None, album=None, date=None):
 		release = query.getReleaseById(results[0].release.id, releaseInclude)
 	except:
 		sys.exit(2)
-#	release = None
 
-	# todo: make sure to choose the correct releaseEvent rather than just the first
+
 	try:
 		Id = release.id
 	except AttributeError:
 		Id = None
+	try:
+		Track = release.tracks[int(tracknumber) - 1].title
+	except:
+		print "err"
+		Track = None
 	try:
 		Title = release.title
 	except:
@@ -101,6 +112,7 @@ def search(artist=None, album=None, date=None):
 	except AttributeError:
 		Genre = None
 	return {
+		"title":Track,
 		"id":Id,
 		"album":Title,
 		"artist":Artist,
@@ -113,7 +125,7 @@ for i in range(len(sys.argv)):
 	if sys.argv[i] in options:
 		options[sys.argv[i]](unicode(sys.argv[i+1], 'utf-8'))
 
-md = search(artist, album, date)
+md = search(tracknumber, artist, album, date)
 
 #print "%s\t%s\t%s\t%s\t%s\t\t" % (data['artist'], data['album'], data['date'], data['label'], data['genre'])
 for f in fields:
