@@ -15,17 +15,19 @@ int main(int argc, char *argv[]) {
 	/*initialize the connection to the freedb server */
 	cddb_conn_t *conn = NULL;
 	cddb_disc_t *disc;
+	cddb_track_t *track;
 	conn = init_conn();
 
 	/* set track info */
-	if (argc != 3) {
-		fprintf(stderr, "usage: cddb_query <discid> <category>\n");
+	if (argc != 4) {
+		fprintf(stderr, "usage: cddb_query <discid> <category> <track number>\n");
 		return -1;
 	}
 	char *p;
 	unsigned long discid = strtoul(argv[1], &p, 16);
 	char *cat = argv[2];
 	lowercase(cat);
+	int tracknum = atoi(argv[3]);
 
 	/* initialize the disc */
 	disc = init_disc();
@@ -35,13 +37,17 @@ int main(int argc, char *argv[]) {
 	/* query the database to populate the disc info */
 	read_db(conn, disc);
 
+	/* extract the track from the disc */
+	track = cddb_disc_get_track(disc, tracknum - 1);
+
 	/* format an output track info */
+	const char *title = cddb_track_get_title(track);
 	const char *artist = cddb_disc_get_artist(disc);
 	const char *album = cddb_disc_get_title(disc);
 	unsigned int date = cddb_disc_get_year(disc);
 	const char *label = "";
 	const char *genre = cddb_disc_get_genre(disc);
-	printf("%s\t%s\t%d\t%s\t%s\t", artist, album, date, label, genre);
+	printf("%s\t%s\t%s\t%d\t%s\t%s\t", title, artist, album, date, label, genre);
 
 	return 0;
 }
