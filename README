@@ -5,6 +5,34 @@ DESCRIPTION:
 	It is intended to be used to collect information about tracks played for
 	royalty payments.
 
+	There are 22 fields per line in the output, and they are defined as follows
+	General:
+		1: File Name
+	On Disk Data (in the metadata stored in the files)
+		2: Track Title
+		3: Track Number
+		4: Artist
+		5: Album 
+		6: Release Date
+		7: Label
+		8: Genre/CDDB Category
+		9: CDDB ID
+	Data Extracted from Musicbrainz:
+		10: Track Title
+		11: Artist
+		12: Album
+		13: Release Date
+		14: Label
+		15: Genre
+		16: CDDB ID
+	Data Extracted from FreeDB:
+		17: Track Title
+		18: Artist
+		19: Album
+		20: Date
+		21: Label
+		22: Genre/CDDB Category
+
 BUILD:
 	To build the suite, simply run
 		$ make
