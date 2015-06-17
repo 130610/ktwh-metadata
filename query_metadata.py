@@ -5,8 +5,7 @@ import mutagen
 UTF8Writer = codecs.getwriter('utf8')
 sys.stdout = UTF8Writer(sys.stdout)
 
-fields = ['artist', 'album', 'date', 'label', 'genre', 'cddb']
-
+fields = ['title', 'tracknumber', 'artist', 'album', 'date', 'label', 'genre', 'cddb']
 def getData():
 	try:
 		path = sys.argv[1]
@@ -15,7 +14,7 @@ def getData():
 		sys.exit()
 
 	try:
-		metadata = mutagen.File(path, easy=True)
+		metadata = mutagen.File(path, easy=False)
 	except:
 		print "file \"", path, "\" doesn't exist."
 		sys.exit()
