@@ -23,11 +23,7 @@ def getData():
 		print "usage: python2 query_metadata.py <filename>"
 		sys.exit()
 
-	try:
-		metadata = mutagen.File(path, easy=True)
-	except:
-		print "file \"", path, "\" doesn't exist."
-		sys.exit()
+	metadata = mutagen.File(path, easy=True)
 
 	return metadata
 
