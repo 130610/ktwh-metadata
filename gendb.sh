@@ -6,11 +6,13 @@ function output_md {
 	IFS=' '
 	md=$(python2 query_metadata.py "$1")
 	mb_md=$(python2 query_musicbrainz.py -n "$(echo "$md" | cut -f2)" -a \""$(echo "$md" | cut -f3)"\" -t \""$(echo "$md" | cut -f4)"\" -d \""$(echo "$md" | cut -f5)"\")
+	ret=$?
 	fdb_md=$(exec timeout .2 ./query_freedb $(echo "$md" | cut -f8) $(echo "$md" | cut -f7) $(echo "$md" | cut -f2))
 	if [[ -z "$fdb_md" ]]; then
 		fdb_md="$(echo -e "\t\t\t\t\t\t")"
 	fi
 	echo "$md$mb_md$fdb_md"
+	return $ret
 }
 
 function get_files {
@@ -29,9 +31,12 @@ files=$(get_files "$1")
 
 for file in $files; do
 	while : ;do
+		sleep 1 &
 		md=$(output_md "$file")
-		[[ $? == 2 ]] || break
-		echo "--- 503 Error: denial of service, waiting for 5 second ---" 1>&2 && sleep 5
+		md_pid=$?
+		wait
+		[[ $md_pid == 2 ]] || break
+		echo "--- 503 Error: denial of service, waiting for 5 seconds ---" 1>&2 && sleep 5
 	done
 	echo "$file	$md"
 done

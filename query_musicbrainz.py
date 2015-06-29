@@ -59,6 +59,7 @@ def search(tracknumber=None, artist=None, album=None, date=None):
 		results = query.getReleases(searchTerms)
 	except:
 		sys.exit(2)
+
 	releaseInclude = ws.ReleaseIncludes(artist=True,
 	                                    counts=True,
 	                                    releaseEvents=True,
