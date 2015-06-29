@@ -1,11 +1,20 @@
 import sys
 import codecs
+import re
 import mutagen
 
 UTF8Writer = codecs.getwriter('utf8')
 sys.stdout = UTF8Writer(sys.stdout)
 
 fields = ['title', 'tracknumber', 'artist', 'album', 'date', 'label', 'genre', 'cddb']
+
+def cleanTrackNumber(numString):
+	match = re.search("^[0-9]+", str(numString))
+	try:
+		return match.group()
+	except AttributeError:
+		return None
+
 def getData():
 	try:
 		path = sys.argv[1]
