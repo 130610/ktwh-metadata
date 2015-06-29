@@ -23,7 +23,7 @@ def getData():
 		sys.exit()
 
 	try:
-		metadata = mutagen.File(path, easy=False)
+		metadata = mutagen.File(path, easy=True)
 	except:
 		print "file \"", path, "\" doesn't exist."
 		sys.exit()
@@ -31,6 +31,7 @@ def getData():
 	return metadata
 
 md = getData()
+fields = populateFields(fields, md)
 
 for f in fields:
 	try:
