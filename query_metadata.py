@@ -7,6 +7,7 @@ UTF8Writer = codecs.getwriter('utf8')
 sys.stdout = UTF8Writer(sys.stdout)
 
 fields = ['title', 'tracknumber', 'artist', 'album', 'date', 'label', 'genre', 'cddb']
+fields = {key : None for key in fields}
 
 def cleanTrackNumber(numString):
 	match = re.search("^[0-9]+", str(numString))
@@ -30,14 +31,22 @@ def getData():
 
 	return metadata
 
+def populateFields(fields, md):
+	for f in fields:
+		try:
+			fields[f] = md[f][0]
+		except KeyError:
+			fields[f] = ""
+	fields['tracknumber'] = cleanTrackNumber(fields['tracknumber'])
+
+	return fields
+
 md = getData()
 fields = populateFields(fields, md)
 
 for f in fields:
-	try:
-		print md[f][0], u'\t',
-	except KeyError:
-		print u'', u'\t',
+	print fields[f], u'\t',
+	
 print
 
 #print "%s\t%s\t%s\t%s\t%s\t%s" % (md['artist'][0], md['album'][0], md['date'][0], "", md['genre'][0], md['cddb'][0])
