@@ -1,4 +1,5 @@
 #/bin/bash
+tmp_file="/tmp/ktwh-tmp.txt"
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 
@@ -26,10 +27,10 @@ function get_files {
 }
 
 
-files=$(get_files "$1")
+get_files "$1" > $tmp_file
 #get_files "$1"
 
-for file in $files; do
+for file in $(cat $tmp_file); do
 	while : ;do
 		sleep 1 &
 		md=$(output_md "$file")
