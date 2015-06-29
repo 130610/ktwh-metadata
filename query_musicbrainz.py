@@ -85,7 +85,6 @@ def search(tracknumber=None, artist=None, album=None, date=None):
 	try:
 		Track = release.tracks[int(tracknumber) - 1].title
 	except:
-		print "err"
 		Track = None
 	try:
 		Title = release.title
