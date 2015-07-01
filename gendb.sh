@@ -21,15 +21,16 @@ function get_files {
 	shopt -s nocasematch
 
 	for file in $(find "$1"); do
-		if [[ "$file" =~ .*\.flac$ ]] || [[ "$file" =~ .*\.mp3$ ]] ; then
+		if ( [[ "$file" =~ .*\.flac$ ]] ||\
+		   [[ "$file" =~ .*\.mp3$ ]] ) &&\
+		   [[ "$(basename "$file")" =~ ^[^\.][^_-].*$ ]]; then
 			echo "$file"
 		fi
 	done
 }
 
-
 get_files "$1" > $tmp_file
-#get_files "$1"
+sort $tmp_file -o $tmp_file
 
 for file in $(cat $tmp_file); do
 	while : ;do
