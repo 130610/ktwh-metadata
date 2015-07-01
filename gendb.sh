@@ -33,10 +33,13 @@ get_files "$1" > $tmp_file
 sort $tmp_file -o $tmp_file
 
 for file in $(cat $tmp_file); do
-	while : ;do
+	count=1
+	while [[ $count < 5 ]] ; do
+		let "count++"
 		sleep 1 &
 		md=$(output_md "$file")
 		md_pid=$?
+		#echo "$md"
 		wait
 		[[ $md_pid == 2 ]] || break
 		echo "--- 503 Error: denial of service, waiting for 5 seconds ---" 1>&2 && sleep 5
