@@ -7,7 +7,6 @@ UTF8Writer = codecs.getwriter('utf8')
 sys.stdout = UTF8Writer(sys.stdout)
 
 fields = ['title', 'tracknumber', 'artist', 'album', 'date', 'label', 'genre', 'cddb']
-fieldDict = {key : None for key in fields}
 
 def cleanTrackNumber(numString):
 	'''
@@ -59,6 +58,7 @@ def printFields():
 	'''
 	legacy support for gendb.sh (call python scripts from bash script)
 	'''
+	fieldDict = {key : None for key in fields}
 	md = getDataOld()
 	fieldDict = populateFields(fieldDict, md)
 
@@ -66,4 +66,4 @@ def printFields():
 		print fieldDict[f], u'\t',
 
 # uncomment to use with gendb.sh (old method)
-#printFields()
+printFields()
