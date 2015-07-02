@@ -9,8 +9,7 @@ sys.stdout = UTF8Writer(sys.stdout)
 UTF8Reader = codecs.getreader('utf8')
 sys.stdin = UTF8Reader(sys.stdin)
 
-fields = ['title', 'tracknumber', 'artist', 'album', 'date', 'label', 'genre', 'cddb']
-fieldDict = {key: None for key in fields}
+FIELDS = ['title', 'tracknumber', 'artist', 'album', 'date', 'label', 'genre', 'cddb', 'isrc']
 
 # default values
 tracknumber = 1
@@ -68,6 +67,15 @@ def bestTag(tags):
 	return best
 
 def search(tracknumber=1, artist=None, album=None, date=None):
+	'''
+	searches musicbrainz database for metadata based on artist, album, date,
+	and tracknumber
+	tracknumber: int
+	artist: string or None
+	album: string or None
+	date: string or None
+	returns: dict of metadata with keys derived from FIELDS
+	'''
 	query = ws.Query()
 	searchTerms = ws.ReleaseFilter(title=album, artistName=artist, query=date)
 	try:
@@ -94,48 +102,29 @@ def search(tracknumber=1, artist=None, album=None, date=None):
 		print "query failed" >> sys.stderr
 		sys.exit(2)
 
+	ret = {key: None for key in FIELDS}
+	ret["id"] = release.getId()
+	tracks = release.getTracks()
+	if (len(tracks) >= int(tracknumber)):
+		track = tracks[int(tracknumber) - 1]
+		ret["title"] = track.getTitle()
+		isrcs = track.getISRCs()
+		if (len(isrcs) > 0):
+			ret["isrc"] = isrcs[0]
+	ret["tracknumber"] = tracknumber
+	ret["album"] = release.getTitle()
+	artist = release.getArtist()
+	if (artist):
+		ret["artist"] = release.getArtist().getName()
+	event = release.getEarliestReleaseEvent()
+	if (event):
+		ret["date"] = event.getDate()
+		label = event.getLabel()
+		if (label):
+			ret["label"] = label.getName()
+	ret["genre"] = bestTag(release.getTags())
+	return ret
 
-	try:
-		Id = release.id
-	except AttributeError:
-		Id = None
-	try:
-		Track = release.tracks[int(tracknumber) - 1].title
-	except:
-		Track = None
-	try:
-		Title = release.title
-	except:
-		Title = None
-	try:
-		Artist = release.artist.name
-	except AttributeError:
-		Artist = None
-	try:
-		Date = release.releaseEvents[0].date
-	except AttributeError:
-		Date = None
-	except IndexError:
-		Date = None
-	try:
-		Label = release.releaseEvents[0].label.name
-	except AttributeError:
-		Label = None
-	except IndexError:
-		Label = None
-	try:
-		Genre = bestTag(release.tags)
-	except AttributeError:
-		Genre = None
-	return {
-		"title":Track,
-		"id":Id,
-		"album":Title,
-		"artist":Artist,
-		"date":Date,
-		"label":Label,
-		"genre":Genre
-	}
 def parseOptions():
 	'''
 	legacy feature to parse command line options from gendb.sh
