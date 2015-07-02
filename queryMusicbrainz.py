@@ -1,4 +1,5 @@
 import sys
+import time
 import codecs
 import musicbrainz2.webservice as ws
 
@@ -9,6 +10,7 @@ UTF8Reader = codecs.getreader('utf8')
 sys.stdin = UTF8Reader(sys.stdin)
 
 fields = ['title', 'tracknumber', 'artist', 'album', 'date', 'label', 'genre', 'cddb']
+fieldDict = {key: None for key in fields}
 
 tracknumber = ""
 artist = ""
@@ -42,6 +44,14 @@ options = {
 	   "-d":setDate
 	  }
 
+def rateLimited(minimum, func, *args):
+	before = time.time()
+	ret = func(*args)
+	elapsed = time.time() - before
+	if elapsed < float(minimum):
+		time.sleep(minimum - elapsed)
+	return ret
+
 def bestTag(el):
 	maxScore = 0
 	best = None
@@ -56,8 +66,9 @@ def search(tracknumber=None, artist=None, album=None, date=None):
 #	searchTerms = ws.ReleaseFilter(title=album, artistName=artist, query=date)
 	searchTerms = ws.ReleaseFilter(query=artist + ", " + album + ", " + date)
 	try:
-		results = query.getReleases(searchTerms)
+		results = rateLimited(1.0, query.getReleases, searchTerms)
 	except:
+		print "1"
 		sys.exit(2)
 
 	releaseInclude = ws.ReleaseIncludes(artist=True,
@@ -74,8 +85,9 @@ def search(tracknumber=None, artist=None, album=None, date=None):
 	                                    isrcs=True, 
 	                                    releaseGroup=True)
 	try:
-		release = query.getReleaseById(results[0].release.id, releaseInclude)
+		release = rateLimited(1.0, query.getReleaseById, results[0].release.id, releaseInclude)
 	except:
+		print "2"
 		sys.exit(2)
 
 
