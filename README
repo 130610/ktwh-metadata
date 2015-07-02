@@ -25,13 +25,14 @@ DESCRIPTION:
 		14: Label
 		15: Genre
 		16: CDDB ID
+		17: ISRC
 	Data Extracted from FreeDB:
-		17: Track Title
-		18: Artist
-		19: Album
-		20: Date
-		21: Label
-		22: Genre/CDDB Category
+		18: Track Title
+		19: Artist
+		20: Album
+		21: Date
+		22: Label
+		23: Genre/CDDB Category
 
 BUILD:
 	To build the suite, simply run
@@ -50,6 +51,15 @@ DEPENDENCIES:
 USAGE:
 	To generate the a database, use the wrapper script gendb.sh
 		$ ./gendb.sh <music dir> > db.txt
+
+KNOWN BUGS:
+	-Under some circumstances, musicbrainz will return an album from the
+	 publisher "Pastel Music" when it doesn't find the correct album. This
+	 appears to be some sort of default album, but it may also be a bug in
+	 my query script... further investigation is needed.
+	-Currently, the gendb.sh doesn't query freedb at all, as very few tracks
+	 in our collection have cddb id's in the metadata. An alternate method
+	 for searching freedb needs to be implemented.
 
 TO DO:
 	- Add ability to write tags back to files for easy indexing
