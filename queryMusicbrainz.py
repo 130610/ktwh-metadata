@@ -81,7 +81,7 @@ def search(tracknumber=1, artist=None, album=None, date=None):
 	try:
 		results = rateLimited(1.0, query.getReleases, searchTerms)
 	except:
-		print "query failed" >> sys.stderr
+		sys.stderr.write("query failed")
 		sys.exit(2)
 	releaseInclude = ws.ReleaseIncludes(artist=True,
 	                                    counts=True,
@@ -99,7 +99,7 @@ def search(tracknumber=1, artist=None, album=None, date=None):
 	try:
 		release = rateLimited(1.0, query.getReleaseById, results[0].release.id, releaseInclude)
 	except:
-		print "query failed" >> sys.stderr
+		sys.stderr.write("query failed")
 		sys.exit(2)
 
 	ret = {key: None for key in FIELDS}
