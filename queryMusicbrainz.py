@@ -77,7 +77,7 @@ def search(tracknumber=1, artist=None, album=None, date=None):
 	returns: dict of metadata with keys derived from FIELDS
 	'''
 	query = ws.Query()
-	searchTerms = ws.ReleaseFilter(title=album, artistName=artist, query=date)
+	searchTerms = ws.ReleaseFilter(query=artist + ", " + album + ", " + date)
 	try:
 		results = rateLimited(1.0, query.getReleases, searchTerms)
 	except:
