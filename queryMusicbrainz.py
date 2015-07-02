@@ -44,9 +44,9 @@ options = {
 	   "-d":setDate
 	  }
 
-def rateLimited(minimum, func, *args):
+def rateLimited(minimum, func, *args, **kargs):
 	before = time.time()
-	ret = func(*args)
+	ret = func(*args, **kargs)
 	elapsed = time.time() - before
 	if elapsed < float(minimum):
 		time.sleep(minimum - elapsed)
