@@ -10,24 +10,42 @@ fields = ['title', 'tracknumber', 'artist', 'album', 'date', 'label', 'genre', '
 fieldDict = {key : None for key in fields}
 
 def cleanTrackNumber(numString):
+	'''
+	removes any extra characters from track number
+	numString: string of digits
+	return: int
+	'''
 	match = re.search("^[0-9]+", str(numString))
 	try:
-		return match.group()
+		return match.group(0)
 	except AttributeError:
 		return None
 
-def getData():
+def getDataOld():
+	'''
+	legacy support for getting path from command line
+	'''
 	try:
 		path = sys.argv[1]
 	except:
 		print "usage: python2 query_metadata.py <filename>"
 		sys.exit()
-
 	metadata = mutagen.File(path, easy=True)
-
 	return metadata
 
+def getData(path):
+	'''
+	path: string
+	returns: mutagen.Metadata
+	'''
+	return mutagen.File(path, easy=True)
+
 def populateFields(fields, md):
+	'''
+	fields: dict of None value field name keys
+	md: mutagen.Metadata
+	returns: dict of populated field name keys (based on md)
+	'''
 	for f in fields:
 		try:
 			fields[f] = md[f][0]
@@ -37,13 +55,15 @@ def populateFields(fields, md):
 
 	return fields
 
-md = getData()
-fieldDict = populateFields(fieldDict, md)
+def printFields():
+	'''
+	legacy support for gendb.sh (call python scripts from bash script)
+	'''
+	md = getDataOld()
+	fieldDict = populateFields(fieldDict, md)
 
-for f in fields:
-	print fieldDict[f], u'\t',
+	for f in fields:
+		print fieldDict[f], u'\t',
 
-print
-
-#print "%s\t%s\t%s\t%s\t%s\t%s" % (md['artist'][0], md['album'][0], md['date'][0], "", md['genre'][0], md['cddb'][0])
-#print md['artist'][0], "\t", md['album'][0], "\t", md['date'][0], "\t", "", "\t", md['genre'][0], "\t", md['cddb'][0]
+# uncomment to use with gendb.sh (old method)
+#printFields()
