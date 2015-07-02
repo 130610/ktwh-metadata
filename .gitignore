@@ -1,2 +1,4 @@
 query_freedb
+old-tests
+*.pyc
 .*.swp
