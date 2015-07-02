@@ -12,10 +12,11 @@ sys.stdin = UTF8Reader(sys.stdin)
 fields = ['title', 'tracknumber', 'artist', 'album', 'date', 'label', 'genre', 'cddb']
 fieldDict = {key: None for key in fields}
 
-tracknumber = ""
-artist = ""
-album = ""
-date = ""
+# default values
+tracknumber = 1
+artist = None
+album = None
+date = None
 
 def setTrackNumber(num=1):
 	global tracknumber
@@ -52,25 +53,28 @@ def rateLimited(minimum, func, *args, **kargs):
 		time.sleep(minimum - elapsed)
 	return ret
 
-def bestTag(el):
+def bestTag(tags):
+	'''
+	chooses tag from list with highest score
+	tags: list of musicbrainz2.model.Tag
+	return: musicbrainz2.model.Tag"
+	'''
 	maxScore = 0
 	best = None
-	for entity in el:
-		if entity.count > 0:
-			maxScore = entity.count
-			best = entity
+	for tag in tags:
+		if tag.count > 0:
+			maxScore = tag.count
+			best = tag
 	return best
 
-def search(tracknumber=None, artist=None, album=None, date=None):
+def search(tracknumber=1, artist=None, album=None, date=None):
 	query = ws.Query()
-#	searchTerms = ws.ReleaseFilter(title=album, artistName=artist, query=date)
-	searchTerms = ws.ReleaseFilter(query=artist + ", " + album + ", " + date)
+	searchTerms = ws.ReleaseFilter(title=album, artistName=artist, query=date)
 	try:
 		results = rateLimited(1.0, query.getReleases, searchTerms)
 	except:
-		print "1"
+		print "query failed" >> sys.stderr
 		sys.exit(2)
-
 	releaseInclude = ws.ReleaseIncludes(artist=True,
 	                                    counts=True,
 	                                    releaseEvents=True,
@@ -87,7 +91,7 @@ def search(tracknumber=None, artist=None, album=None, date=None):
 	try:
 		release = rateLimited(1.0, query.getReleaseById, results[0].release.id, releaseInclude)
 	except:
-		print "2"
+		print "query failed" >> sys.stderr
 		sys.exit(2)
 
 
@@ -132,16 +136,24 @@ def search(tracknumber=None, artist=None, album=None, date=None):
 		"label":Label,
 		"genre":Genre
 	}
+def parseOptions():
+	'''
+	legacy feature to parse command line options from gendb.sh
+	'''
+	for i in range(len(sys.argv)):
+		if sys.argv[i] in options:
+			options[sys.argv[i]](unicode(sys.argv[i+1], 'utf-8'))
 
-for i in range(len(sys.argv)):
-	if sys.argv[i] in options:
-		options[sys.argv[i]](unicode(sys.argv[i+1], 'utf-8'))
+def printFields():
+	'''
+	legacy/debugging function to directly print data from musicbrainz
+	'''
+	parseOptions()
+	md = search(tracknumber, artist, album, date)
+	for f in FIELDS:
+		try:
+			print md[f], '\t',
+		except KeyError:
+			print '', '\t',
 
-md = search(tracknumber, artist, album, date)
-
-#print "%s\t%s\t%s\t%s\t%s\t\t" % (data['artist'], data['album'], data['date'], data['label'], data['genre'])
-for f in fields:
-	try:
-		print md[f], '\t',
-	except KeyError:
-		print '', '\t',
+printFields()
