@@ -55,7 +55,7 @@ def bestTag(tags):
 	'''
 	chooses tag from list with highest score
 	tags: list of musicbrainz2.model.Tag
-	return: musicbrainz2.model.Tag"
+	return: musicbrainz2.model.Tag
 	'''
 	maxScore = 0
 	best = None
@@ -67,12 +67,12 @@ def bestTag(tags):
 
 def makeLuceneQuery(artist, album, date):
 	terms = []
-	if (artist) and (artist != ""):
-		terms.append('artist:"{}"'.format(artist))
-	if (album) and (album != ""):
-		terms.append('release:"{}"'.format(album))
-	if (date) and (album != ""):
-		terms.append('date:"{}"'.format(date))
+	if (artist) and (artist != u''):
+		terms.append(u'artist:"{}"'.format(artist))
+	if (album) and (album != u''):
+		terms.append(u'release:"{}"'.format(album))
+	if (date) and (album != ''):
+		terms.append(u'date:"{}"'.format(date))
 
 	if (len(terms) > 0):
 		ret = ""
@@ -161,8 +161,8 @@ def printFields():
 	md = search(tracknumber, artist, album, date)
 	for f in FIELDS:
 		try:
-			sys.stdout.write(str(md[f]) + '\t')
+			sys.stdout.write(unicode(md[f]) + u'\t')
 		except KeyError:
-			sys.stdout.write('\t')
+			sys.stdout.write(u'\t')
 
 printFields()
