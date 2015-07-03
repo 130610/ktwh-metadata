@@ -29,8 +29,12 @@ def getDataOld():
 	except:
 		print "usage: python2 query_metadata.py <filename>"
 		sys.exit()
-	metadata = mutagen.File(path, easy=True)
-	return metadata
+	try:
+		metadata = mutagen.File(path, easy=True)
+		return metadata
+	except:
+		sys.stderr.write('query failed: file did not have metadata')
+		return False
 
 def getData(path):
 	'''
@@ -60,7 +64,8 @@ def printFields():
 	'''
 	fieldDict = {key : None for key in fields}
 	md = getDataOld()
-	fieldDict = populateFields(fieldDict, md)
+	if (md):
+		fieldDict = populateFields(fieldDict, md)
 
 	for f in fields:
 		if fieldDict[f]:
