@@ -63,7 +63,10 @@ def printFields():
 	fieldDict = populateFields(fieldDict, md)
 
 	for f in fields:
-		print fieldDict[f], u'\t',
+		if fieldDict[f]:
+			sys.stdout.write(fieldDict[f] + u'\t')
+		else:
+			sys.stdout.write(u'\t' + u'\t')
 
 # uncomment to use with gendb.sh (old method)
 printFields()
