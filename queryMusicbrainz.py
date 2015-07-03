@@ -100,8 +100,8 @@ def search(tracknumber=1, artist=None, album=None, date=None):
 	searchTerms = ws.ReleaseFilter(query=queryString)
 	try:
 		results = rateLimited(1.0, query.getReleases, searchTerms)
-	except:
-		sys.stderr.write("query failed")
+	except ws.WebServiceError:
+		sys.stderr.write("query failed: 503 error\n")
 		sys.exit(2)
 	releaseInclude = ws.ReleaseIncludes(artist=True,
 	                                    counts=True,
@@ -118,8 +118,8 @@ def search(tracknumber=1, artist=None, album=None, date=None):
 	                                    releaseGroup=True)
 	try:
 		release = rateLimited(1.0, query.getReleaseById, results[0].release.id, releaseInclude)
-	except:
-		sys.stderr.write("query failed")
+	except ws.WebServiceError:
+		sys.stderr.write("query failed: 503 error\n")
 		sys.exit(2)
 
 	ret = {key: None for key in FIELDS}
@@ -161,8 +161,8 @@ def printFields():
 	md = search(tracknumber, artist, album, date)
 	for f in FIELDS:
 		try:
-			print md[f], '\t',
+			sys.stdout.write(str(md[f]) + '\t')
 		except KeyError:
-			print '', '\t',
+			sys.stdout.write('\t')
 
 printFields()
