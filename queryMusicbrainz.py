@@ -19,23 +19,22 @@ date = None
 
 def setTrackNumber(num=1):
 	global tracknumber
-	tracknumber=num
-	return 1
+	if (num):
+		tracknumber = num
+	else:
+		tracknumber = 1
 
 def setArtist(name=None):
 	global artist
-	artist = u"artist:" + name
-	return 1
+	artist = name
 
 def setAlbum(name=None):
 	global album
-	album = u"release:" + name
-	return 1
+	album = name
 
 def setDate(num=None):
 	global date
-	date = u"date:" + str(num)
-	return 1
+	date = str(num)
 
 options = {
 	   "-n":setTrackNumber,
@@ -66,6 +65,23 @@ def bestTag(tags):
 			best = tag
 	return best
 
+def makeLuceneQuery(artist, album, date):
+	terms = []
+	if (artist) and (artist != ""):
+		terms.append('artist:"{}"'.format(artist))
+	if (album) and (album != ""):
+		terms.append('release:"{}"'.format(album))
+	if (date) and (album != ""):
+		terms.append('date:"{}"'.format(date))
+
+	if (len(terms) > 0):
+		ret = ""
+		for term in terms:
+			ret += (term + ", ")
+		return ret
+	else:
+		return None
+
 def search(tracknumber=1, artist=None, album=None, date=None):
 	'''
 	searches musicbrainz database for metadata based on artist, album, date,
@@ -77,7 +93,11 @@ def search(tracknumber=1, artist=None, album=None, date=None):
 	returns: dict of metadata with keys derived from FIELDS
 	'''
 	query = ws.Query()
-	searchTerms = ws.ReleaseFilter(query=artist + ", " + album + ", " + date)
+	queryString = makeLuceneQuery(artist, album, date)
+	if not queryString:
+		sys.stderr.write("query failed: no metadata provided\n")
+		sys.exit(3)
+	searchTerms = ws.ReleaseFilter(query=queryString)
 	try:
 		results = rateLimited(1.0, query.getReleases, searchTerms)
 	except:
