@@ -1,5 +1,6 @@
 import sys
 import time
+import signal
 import codecs
 import musicbrainz2.webservice as ws
 
@@ -16,6 +17,12 @@ tracknumber = 1
 artist = None
 album = None
 date = None
+
+class TimeoutError(Exception):
+	def __init__(self, message="a timeout occured"):
+		self.message = message
+	def __str__(self):
+		print repr(self.message)
 
 def setTrackNumber(num=1):
 	global tracknumber
@@ -43,12 +50,23 @@ options = {
 	   "-d":setDate
 	  }
 
-def rateLimited(minimum, func, *args, **kargs):
+def rateLimited(min, max, func, *args, **kargs):
+	def _handle_timeout(sig, frm):
+		raise TimeoutError("musicbrainz query took too long")
+
+	signal.signal(signal.SIGALRM, _handle_timeout)
+	signal.alarm(max)
 	before = time.time()
-	ret = func(*args, **kargs)
+	try:
+		ret = func(*args, **kargs)
+	except TimeoutError:
+		raise
+		sys.exit(4)
+	finally:
+		signal.alarm(0)
 	elapsed = time.time() - before
-	if elapsed < float(minimum):
-		time.sleep(minimum - elapsed)
+	if elapsed < float(min):
+		time.sleep(min - elapsed)
 	return ret
 
 def bestTag(tags):
@@ -99,7 +117,7 @@ def search(tracknumber=1, artist=None, album=None, date=None):
 		sys.exit(3)
 	searchTerms = ws.ReleaseFilter(query=queryString)
 	try:
-		results = rateLimited(1.0, query.getReleases, searchTerms)
+		results = rateLimited(1, 10, query.getReleases, searchTerms)
 	except ws.WebServiceError:
 		sys.stderr.write("query failed: 503 error\n")
 		sys.exit(2)
@@ -117,7 +135,7 @@ def search(tracknumber=1, artist=None, album=None, date=None):
 	                                    isrcs=True, 
 	                                    releaseGroup=True)
 	try:
-		release = rateLimited(1.0, query.getReleaseById, results[0].release.id, releaseInclude)
+		release = rateLimited(1, 10, query.getReleaseById, results[0].release.id, releaseInclude)
 	except ws.WebServiceError:
 		sys.stderr.write("query failed: 503 error\n")
 		sys.exit(2)
