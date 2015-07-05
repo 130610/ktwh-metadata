@@ -1,5 +1,6 @@
 #/bin/bash
 tmp_file="/tmp/ktwh-tmp.txt"
+file_list="$1"
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 
@@ -29,10 +30,10 @@ function get_files {
 	done
 }
 
-get_files "$1" > $tmp_file
-sort $tmp_file -o $tmp_file
+#get_files "$1" > $tmp_file
+#sort $tmp_file -o $tmp_file
 
-for file in $(cat $tmp_file); do
+for file in $(cat $file_list); do
 	count=1
 	while [[ $count < 5 ]] ; do
 		let "count++"
